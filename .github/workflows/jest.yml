@@ -2,12 +2,12 @@ name: Jest tests
 
 on:
     push:
-        branches: [ "main" ]
+        branches: ["main"]
     pull_request:
-        branches: [ "main" ]
+        branches: ["main"]
 
 jobs:
-    build:
+    test:
         # All commands should be platform agnostic
         runs-on: ubuntu-latest
 
