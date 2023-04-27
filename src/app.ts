@@ -6,6 +6,7 @@ import {
     createJob,
     registerJob
 } from "./task.model";
+import { checkDelegatedWork, generateWork } from "./maintenance";
 import express from "express";
 import bodyParser from "body-parser";
 
@@ -47,6 +48,11 @@ app.post<unknown, unknown, unknown, GetTaskQuery>(
         res.send();
     }
 );
+
+setInterval(() => {
+    checkDelegatedWork();
+    generateWork();
+}, 30 * 60 * 1000);
 
 // Start server
 app.listen(port, () => {

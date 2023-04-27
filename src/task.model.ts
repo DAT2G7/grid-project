@@ -4,10 +4,10 @@ import path from "path";
 
 const taskRequestEndpoint = "http://localhost:3001/get-task";
 const taskResultEndpoint = "http://localhost:3001/submit-task";
-const gridServerEndpoint = "http://localhost:3000";
-const jobsJsonPath = path.resolve(process.cwd(), "./jobs.json");
+export const gridServerEndpoint = "http://localhost:3000";
+export const jobsJsonPath = path.resolve(process.cwd(), "./jobs.json");
 const finishedJobsJsonPath = path.resolve(process.cwd(), "./finishedJobs.json");
-const projectid = "1601baa2-2712-43d0-bf62-e55aebc85bd1";
+const projectid = "b59151cd-31de-447d-bbf8-fd5ed08eea99";
 
 // Handle incoming result
 export function recieveResult(GetTaskQuery: GetTaskQuery, result: string) {
@@ -21,6 +21,7 @@ export function recieveResult(GetTaskQuery: GetTaskQuery, result: string) {
     job.completedTasks++;
 
     job.result[task.matrixColumnIndex] = resultArray;
+    job.completionTime = new Date();
 
     saveJob(job);
 
@@ -41,15 +42,12 @@ export function getTaskData(GetTaskQuery: GetTaskQuery) {
     return task.taskData;
 }
 
-function iNeedABreakpoint() {
-    console.log("breakpoint please");
-}
-
 export function createJob(rawData: RawData) {
     const job: Job = {
         jobid: "",
         tasks: [],
         taskAmount: 0,
+        creationTime: new Date(),
         coreid: rawData.coreid,
         completedTasks: 0,
         result: []
@@ -104,7 +102,7 @@ function assignTaskJobIds(job: Job) {
     }
 }
 
-function getJob(jobid: string) {
+export function getJob(jobid: string) {
     const jobs = JSON.parse(readFileOrCreateFile(jobsJsonPath));
 
     return jobs.find((job: Job) => job.jobid === jobid);
@@ -139,7 +137,7 @@ function saveFinishedJob(job: Job) {
     return job;
 }
 
-function readFileOrCreateFile(path: string) {
+export function readFileOrCreateFile(path: string) {
     if (!fs.existsSync(path)) {
         fs.writeFileSync(path, "[]");
     }

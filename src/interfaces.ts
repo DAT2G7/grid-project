@@ -9,6 +9,7 @@ export interface Job {
     tasks: Task[];
     taskAmount: number;
     coreid: string;
+    creationTime: Date;
     completedTasks: number;
     result: number[][];
 }
@@ -18,6 +19,7 @@ export interface Task {
     taskid: string;
     completed: boolean;
     delegationTime?: Date;
+    completionTime?: Date;
     taskData: TaskData;
     matrixColumnIndex: number;
 }
