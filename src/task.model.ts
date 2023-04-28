@@ -5,7 +5,7 @@ import path from "path";
 const taskRequestEndpoint = "http://localhost:3001/get-task";
 const taskResultEndpoint = "http://localhost:3001/submit-task";
 export const gridServerEndpoint = "http://localhost:3000";
-export const jobsJsonPath = path.resolve(process.cwd(), "./../jobs.json");
+export const jobsJsonPath = path.resolve(process.cwd(), "./jobs.json");
 const finishedJobsJsonPath = path.resolve(process.cwd(), "./finishedJobs.json");
 const projectid = "b59151cd-31de-447d-bbf8-fd5ed08eea99";
 
@@ -45,11 +45,11 @@ export function recieveResult(GetTaskQuery: GetTaskQuery, result: string) {
         for (let i = 0; i < job.taskAmount; i++) {
             if (job.tasks[i].taskData.matrixA === undefined) {
                 job.tasks[i].taskData.matrixA = resultMatrix;
-                continue;
+                break;
             }
             if (job.tasks[i].taskData.matrixB === undefined) {
                 job.tasks[i].taskData.matrixB = resultMatrix;
-                continue;
+                break;
             }
         }
     }
