@@ -28,7 +28,7 @@ export function getResults(): Result[] {
 
 // Handle incoming result
 export function recieveResult(GetTaskQuery: GetTaskQuery, result: string) {
-    const resultArray = result as unknown as number[];
+    const resultMatrix = result as unknown as number[][];
     const job = getJob(GetTaskQuery.jobid);
 
     const task = job.tasks.find(
@@ -37,20 +37,37 @@ export function recieveResult(GetTaskQuery: GetTaskQuery, result: string) {
     task.completed = true;
     job.completedTasks++;
 
-    job.result[task.matrixColumnIndex] = resultArray;
-    job.completionTime = new Date();
+    if (job.completedTasks === job.taskAmount) {
+        job.completionTime = new Date();
+        job.result = resultMatrix;
+        saveFinishedJob(job);
+    } else {
+        for (let i = 0; i < job.taskAmount; i++) {
+            if (job.tasks[i].taskData.matrixA === undefined) {
+                job.tasks[i].taskData.matrixA = resultMatrix;
+                continue;
+            }
+            if (job.tasks[i].taskData.matrixB === undefined) {
+                job.tasks[i].taskData.matrixB = resultMatrix;
+                continue;
+            }
+        }
+    }
 
     saveJob(job);
-
-    if (job.completedTasks === job.taskAmount) {
-        saveFinishedJob(job);
-    }
 }
 
 export function getTaskData(GetTaskQuery: GetTaskQuery) {
     const job = getJob(GetTaskQuery.jobid);
 
-    const task = job.tasks.find((task: Task) => task.taskid === "0000");
+    const task = job.tasks.find(
+        (task: Task) =>
+            task.taskid === "0000" &&
+            !(
+                task.taskData.matrixA === undefined ||
+                task.taskData.matrixB === undefined
+            )
+    );
 
     task.taskid = GetTaskQuery.taskid;
     task.delegationTime = new Date();
@@ -63,28 +80,42 @@ export function createJob(rawData: RawData) {
     const job: Job = {
         jobid: "",
         tasks: [],
-        taskAmount: 0,
+        taskAmount: rawData.matrixes.length - 1,
         creationTime: new Date(),
         coreid: rawData.coreid,
         completedTasks: 0,
         result: []
     };
 
-    for (let i = 0; i < rawData.matrixOne[0].length; i++) {
+    for (let i = 0; i < rawData.matrixes[0].length - 1; i++) {
         const task: Task = {
             jobid: "0000",
             taskid: "0000",
+            taskData: {
+                matrixA: undefined,
+                matrixB: undefined
+            },
             completed: false,
             delegationTime: undefined,
-            taskData: {
-                matrix: rawData.matrixOne,
-                column: getMatrixColumn(rawData.matrixTwo, i)
-            },
             matrixColumnIndex: i
         };
 
         job.tasks.push(task);
         job.taskAmount++;
+    }
+
+    let matrixIndex: number = 0;
+    for (let i = 0; i < job.tasks.length; i++) {
+        if (matrixIndex === rawData.matrixes.length) {
+            break;
+        }
+        job.tasks[i].taskData.matrixA = rawData.matrixes[matrixIndex];
+        matrixIndex++;
+        if (matrixIndex === rawData.matrixes.length) {
+            break;
+        }
+        job.tasks[i].taskData.matrixB = rawData.matrixes[matrixIndex];
+        matrixIndex++;
     }
 
     return job;
@@ -141,7 +172,6 @@ function saveJob(job: Job) {
 
     const json = JSON.stringify(jobs);
 
-    breakpoint();
     try {
         fs.writeFileSync(jobsJsonPath, json);
     } catch (err) {
@@ -149,11 +179,6 @@ function saveJob(job: Job) {
     }
 
     return job;
-}
-
-function breakpoint() {
-    2 + 2;
-    return;
 }
 
 function saveFinishedJob(job: Job) {
@@ -172,14 +197,4 @@ export function readFileOrCreateFile(path: string) {
     }
 
     return fs.readFileSync(path).toString();
-}
-
-function getMatrixColumn(matrix: number[][], columnIndex: number) {
-    const column: number[] = [];
-
-    for (let i = 0; i < matrix.length; i++) {
-        column.push(matrix[i][columnIndex]);
-    }
-
-    return column;
 }

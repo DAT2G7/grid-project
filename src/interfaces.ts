@@ -24,19 +24,18 @@ export interface Task {
     matrixColumnIndex: number;
 }
 
-export interface TaskData {
-    matrix: number[][];
-    column: number[];
-}
-
 export interface RawData {
     coreid: string;
-    matrixOne: number[][];
-    matrixTwo: number[][];
+    matrixes: number[][][];
 }
 
 export interface FinishedJobs {
     jobs: Job[];
+}
+
+export interface TaskData {
+    matrixA?: number[][];
+    matrixB?: number[][];
 }
 
 export interface Result {
