@@ -38,3 +38,7 @@ export interface RawData {
 export interface FinishedJobs {
     jobs: Job[];
 }
+
+export interface Result {
+    result: number[][];
+}

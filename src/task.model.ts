@@ -1,13 +1,30 @@
-import { GetTaskQuery, Job, Task, RawData } from "./interfaces";
+import { GetTaskQuery, Job, Task, RawData, Result } from "./interfaces";
 import fs from "fs";
 import path from "path";
 
 const taskRequestEndpoint = "http://localhost:3001/get-task";
 const taskResultEndpoint = "http://localhost:3001/submit-task";
 export const gridServerEndpoint = "http://localhost:3000";
-export const jobsJsonPath = path.resolve(process.cwd(), "./jobs.json");
+export const jobsJsonPath = path.resolve(process.cwd(), "./../jobs.json");
 const finishedJobsJsonPath = path.resolve(process.cwd(), "./finishedJobs.json");
 const projectid = "b59151cd-31de-447d-bbf8-fd5ed08eea99";
+
+// Get Results
+export function getResults(): Result[] {
+    const jobs: Job[] = JSON.parse(readFileOrCreateFile(jobsJsonPath));
+
+    let results: Result[] = [];
+
+    jobs.forEach((job) => {
+        let result = {
+            result: job.result
+        };
+
+        results.push(result);
+    });
+
+    return results;
+}
 
 // Handle incoming result
 export function recieveResult(GetTaskQuery: GetTaskQuery, result: string) {
@@ -122,9 +139,21 @@ function saveJob(job: Job) {
         jobs.push(job);
     }
 
-    fs.writeFileSync(jobsJsonPath, JSON.stringify(jobs));
+    const json = JSON.stringify(jobs);
+
+    breakpoint();
+    try {
+        fs.writeFileSync(jobsJsonPath, json);
+    } catch (err) {
+        console.log(err);
+    }
 
     return job;
+}
+
+function breakpoint() {
+    2 + 2;
+    return;
 }
 
 function saveFinishedJob(job: Job) {

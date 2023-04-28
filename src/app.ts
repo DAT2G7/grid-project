@@ -4,9 +4,10 @@ import {
     getTaskData,
     recieveResult,
     createJob,
-    registerJob
+    registerJob,
+    getResults
 } from "./task.model";
-import { checkDelegatedWork, generateWork } from "./maintenance";
+import /*checkDelegatedWork, generateWork */ "./maintenance";
 import express from "express";
 import bodyParser from "body-parser";
 
@@ -49,9 +50,18 @@ app.post<unknown, unknown, unknown, GetTaskQuery>(
     }
 );
 
+app.get<unknown, unknown, unknown>("/results", (_req, res) => {
+    res.contentType("application/json");
+    res.status(200);
+    res.send(JSON.stringify(getResults()));
+});
+
+//checkDelegatedWork();
+//generateWork();
+
 setInterval(() => {
-    checkDelegatedWork();
-    generateWork();
+    //checkDelegatedWork();
+    //generateWork();
 }, 30 * 60 * 1000);
 
 // Start server

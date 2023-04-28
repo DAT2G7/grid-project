@@ -8,10 +8,10 @@ import {
 } from "./task.model";
 import fs from "fs";
 
-const coreid: string = "b10d23c8-26ac-4140-b368-4ad10c18aee2";
-const matrixDimentions: number = 1000000;
+const rawDataPath: string = "./rawData.json";
 
 export function checkDelegatedWork() {
+    const now = new Date();
     const jobs: Job[] = JSON.parse(readFileOrCreateFile(jobsJsonPath));
 
     for (let i = 0; i < jobs.length; i++) {
@@ -19,7 +19,10 @@ export function checkDelegatedWork() {
             continue;
         }
         // 14400000 = 4 hours in ms.
-        if (jobs[i].creationTime.getTime() + 14400000 < Date.now()) {
+        if (
+            new Date(jobs[i].creationTime).getTime() + 14400000 <
+            now.getTime()
+        ) {
             continue;
         }
 
@@ -64,7 +67,7 @@ export function generateWork() {
         return;
     }
 
-    const rawData = generateRawData(matrixDimentions);
+    const rawData = generateRawData();
     const job = createJob(rawData);
     registerJob(job);
 }
@@ -91,23 +94,25 @@ function enoughJobsQueued(): boolean {
     return false;
 }
 
-function generateRawData(matrixDimentions: number): RawData {
-    return {
-        coreid: coreid,
-        matrixOne: generateMatrix(matrixDimentions),
-        matrixTwo: generateMatrix(matrixDimentions)
-    };
+function generateRawData(): RawData {
+    return JSON.parse(fs.readFileSync(rawDataPath, "utf8"));
+
+    //return {
+    //    coreid: coreid,
+    //    matrixOne: generateMatrix(matrixDimentions),
+    //    matrixTwo: generateMatrix(matrixDimentions)
+    //};
 }
 
-function generateMatrix(dimentions: number): number[][] {
-    const matrix: number[][] = [];
-
-    for (let i = 0; i < dimentions; i++) {
-        matrix.push([]);
-        for (let j = 0; j < dimentions; j++) {
-            matrix[i][j] = Math.random() * 10;
-        }
-    }
-
-    return matrix;
-}
+//function generateMatrix(dimentions: number): number[][] {
+//    const matrix: number[][] = [];
+//
+//    for (let i = 0; i < dimentions; i++) {
+//        matrix.push([]);
+//        for (let j = 0; j < dimentions; j++) {
+//            matrix[i][j] = Math.random() * 10;
+//        }
+//    }
+//
+//    return matrix;
+//}
