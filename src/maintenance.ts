@@ -1,18 +1,13 @@
+import config from "./config";
 import { Job, RawData } from "./interfaces";
-import {
-    gridServerEndpoint,
-    jobsJsonPath,
-    readFileOrCreateFile,
-    createJob,
-    registerJob
-} from "./task.model";
+import { readFileOrCreateFile, createJob, registerJob } from "./task.model";
 import fs from "fs";
 
 const rawDataPath: string = "./rawData.json";
 
 export function checkDelegatedWork() {
     const now = new Date();
-    const jobs: Job[] = JSON.parse(readFileOrCreateFile(jobsJsonPath));
+    const jobs: Job[] = JSON.parse(readFileOrCreateFile(config.JOBS_DB_PATH));
 
     for (let i = 0; i < jobs.length; i++) {
         if (jobs[i].completedTasks === jobs[i].taskAmount) {
@@ -43,20 +38,20 @@ export function checkDelegatedWork() {
 }
 
 async function updateJob(job: Job): Promise<Job> {
-    const response = await fetch(gridServerEndpoint + "/updateJob", {
+    const response = await fetch(config.GRID_SERVER_ENDPOINT + "/updateJob", {
         method: "PUT",
         body: JSON.stringify(job),
         headers: { "Content-Type": "application/json" }
     }).then((res) => res.json());
 
-    const jobs: Job[] = JSON.parse(readFileOrCreateFile(jobsJsonPath));
+    const jobs: Job[] = JSON.parse(readFileOrCreateFile(config.JOBS_DB_PATH));
     const index = jobs.findIndex((j) => j.jobid === job.jobid);
 
     job.jobid = response.jobid;
 
     jobs[index] = job;
 
-    fs.writeFileSync(jobsJsonPath, JSON.stringify(jobs));
+    fs.writeFileSync(config.JOBS_DB_PATH, JSON.stringify(jobs));
 
     return job;
 }
@@ -73,7 +68,7 @@ export function generateWork() {
 }
 
 function enoughJobsQueued(): boolean {
-    const jobs: Job[] = JSON.parse(readFileOrCreateFile(jobsJsonPath));
+    const jobs: Job[] = JSON.parse(readFileOrCreateFile(config.JOBS_DB_PATH));
     let queuedTasksNumbers: number = 0;
 
     for (let i = 0; i < jobs.length; i++) {

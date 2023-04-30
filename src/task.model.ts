@@ -1,17 +1,10 @@
 import { GetTaskQuery, Job, Task, RawData, Result } from "./interfaces";
 import fs from "fs";
-import path from "path";
-
-const taskRequestEndpoint = "http://localhost:3001/get-task";
-const taskResultEndpoint = "http://localhost:3001/submit-task";
-export const gridServerEndpoint = "http://localhost:3000";
-export const jobsJsonPath = path.resolve(process.cwd(), "./jobs.json");
-const finishedJobsJsonPath = path.resolve(process.cwd(), "./finishedJobs.json");
-const projectid = "b59151cd-31de-447d-bbf8-fd5ed08eea99";
+import config from "./config";
 
 // Get Results
 export function getResults(): Result[] {
-    const jobs: Job[] = JSON.parse(readFileOrCreateFile(jobsJsonPath));
+    const jobs: Job[] = JSON.parse(readFileOrCreateFile(config.JOBS_DB_PATH));
 
     let results: Result[] = [];
 
@@ -122,15 +115,15 @@ export function createJob(rawData: RawData) {
 
 export async function registerJob(job: Job) {
     const jobQuery = {
-        projectid: projectid,
+        projectid: config.PROJECTID,
         coreid: job.coreid,
         taskAmount: job.taskAmount,
-        taskRequestEndpoint: taskRequestEndpoint,
-        taskResultEndpoint: taskResultEndpoint
+        taskRequestEndpoint: config.TASK_REQUEST_ENDPOINT,
+        taskResultEndpoint: config.TASK_RESULT_ENDPOINT
     };
     const json: string = JSON.stringify(jobQuery);
 
-    await fetch(gridServerEndpoint + "/api/project/job", {
+    await fetch(config.GRID_SERVER_ENDPOINT + "/api/project/job", {
         method: "POST",
         body: json,
         headers: { "Content-Type": "application/json" }
@@ -150,13 +143,13 @@ function assignTaskJobIds(job: Job) {
 }
 
 export function getJob(jobid: string) {
-    const jobs = JSON.parse(readFileOrCreateFile(jobsJsonPath));
+    const jobs = JSON.parse(readFileOrCreateFile(config.JOBS_DB_PATH));
 
     return jobs.find((job: Job) => job.jobid === jobid);
 }
 
 function saveJob(job: Job) {
-    const jobs: Job[] = JSON.parse(readFileOrCreateFile(jobsJsonPath));
+    const jobs: Job[] = JSON.parse(readFileOrCreateFile(config.JOBS_DB_PATH));
 
     // check if job exists on db already.
     // if it does, replace it with the updated one.
@@ -172,7 +165,7 @@ function saveJob(job: Job) {
     const json = JSON.stringify(jobs);
 
     try {
-        fs.writeFileSync(jobsJsonPath, json);
+        fs.writeFileSync(config.JOBS_DB_PATH, json);
     } catch (err) {
         console.log(err);
     }
@@ -181,11 +174,16 @@ function saveJob(job: Job) {
 }
 
 function saveFinishedJob(job: Job) {
-    const finishedJobs = JSON.parse(readFileOrCreateFile(finishedJobsJsonPath));
+    const finishedJobs = JSON.parse(
+        readFileOrCreateFile(config.FINISHED_JOBS_DB_PATH)
+    );
 
     finishedJobs.push(job);
 
-    fs.writeFileSync(finishedJobsJsonPath, JSON.stringify(finishedJobs));
+    fs.writeFileSync(
+        config.FINISHED_JOBS_DB_PATH,
+        JSON.stringify(finishedJobs)
+    );
 
     return job;
 }

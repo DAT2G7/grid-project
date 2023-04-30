@@ -1,5 +1,4 @@
 import { GetTaskQuery, RawData } from "./interfaces";
-import { config as dotenvConfig } from "dotenv";
 import {
     getTaskData,
     recieveResult,
@@ -10,8 +9,6 @@ import {
 import /*checkDelegatedWork, generateWork */ "./maintenance";
 import express from "express";
 import bodyParser from "body-parser";
-
-dotenvConfig();
 
 // init app
 const app = express();
