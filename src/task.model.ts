@@ -101,7 +101,6 @@ export function createJob(rawData: RawData) {
         };
 
         job.tasks.push(task);
-        job.taskAmount++;
     }
 
     let matrixIndex: number = 0;
