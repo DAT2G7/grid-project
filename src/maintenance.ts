@@ -1,113 +1,52 @@
 import config from "./config";
 import { Job, RawData } from "./interfaces";
-import { readFileOrCreateFile, createJob, registerJob } from "./task.model";
+import { createJob, registerJob } from "./task.model";
 import fs from "fs";
 
-const rawDataPath: string = "./rawData.json";
+export function checkWorkQueue(): number {
+    const jobs: Job[] = JSON.parse(
+        fs.readFileSync(config.JOBS_DB_PATH, "utf8")
+    );
 
-export function checkDelegatedWork() {
-    const now = new Date();
-    const jobs: Job[] = JSON.parse(readFileOrCreateFile(config.JOBS_DB_PATH));
+    let queuedTasks = 0;
 
-    for (let i = 0; i < jobs.length; i++) {
-        if (jobs[i].completedTasks === jobs[i].taskAmount) {
-            continue;
+    jobs.forEach((job) => {
+        if (job.completedTasks < job.taskAmount) {
+            queuedTasks += job.taskAmount - job.completedTasks;
         }
-        // 14400000 = 4 hours in ms.
-        if (
-            new Date(jobs[i].creationTime).getTime() + 14400000 <
-            now.getTime()
-        ) {
-            continue;
-        }
+    });
 
-        jobs[i].jobid = "";
-        jobs[i].taskAmount = jobs[i].taskAmount - jobs[i].completedTasks;
-        jobs[i].completedTasks = 0;
-
-        for (let j = 0; j < jobs[i].tasks.length; j++) {
-            if (jobs[i].tasks[j].completed) {
-                continue;
-            }
-            jobs[i].tasks[j].taskid = "0000";
-            jobs[i].tasks[j].delegationTime = undefined;
-        }
-
-        updateJob(jobs[i]);
-    }
+    return queuedTasks;
 }
 
-async function updateJob(job: Job): Promise<Job> {
-    const response = await fetch(config.GRID_SERVER_ENDPOINT + "/updateJob", {
-        method: "PUT",
-        body: JSON.stringify(job),
-        headers: { "Content-Type": "application/json" }
-    }).then((res) => res.json());
-
-    const jobs: Job[] = JSON.parse(readFileOrCreateFile(config.JOBS_DB_PATH));
-    const index = jobs.findIndex((j) => j.jobid === job.jobid);
-
-    job.jobid = response.jobid;
-
-    jobs[index] = job;
-
-    fs.writeFileSync(config.JOBS_DB_PATH, JSON.stringify(jobs));
-
-    return job;
-}
-
-// Functions for creating work automatically
-export function generateWork() {
-    if (enoughJobsQueued()) {
-        return;
-    }
-
+export function createWork() {
     const rawData = generateRawData();
+
     const job = createJob(rawData);
     registerJob(job);
 }
 
-function enoughJobsQueued(): boolean {
-    const jobs: Job[] = JSON.parse(readFileOrCreateFile(config.JOBS_DB_PATH));
-    let queuedTasksNumbers: number = 0;
+function generateRawData(): RawData {
+    let rawData: RawData = {
+        coreid: config.CORE_ID,
+        matrixes: []
+    };
 
-    for (let i = 0; i < jobs.length; i++) {
-        if (jobs[i].completedTasks === jobs[i].taskAmount) {
-            continue;
-        }
-        for (let j = 0; j < jobs[i].tasks.length; j++) {
-            if (jobs[i].tasks[j].completed) {
-                continue;
-            }
-            queuedTasksNumbers++;
-        }
-        if (queuedTasksNumbers > 100) {
-            return true;
+    for (let i = 0; i < config.TASK_AMOUNT + 1; i++) {
+        rawData.matrixes[i] = generateMatrix();
+    }
+    return rawData;
+}
+
+function generateMatrix(): number[][] {
+    let matrix: number[][] = [];
+
+    for (let i = 0; i < config.MATRIX_HEIGHT; i++) {
+        matrix[i] = [];
+        for (let j = 0; j < config.MATRIX_WIDTH; j++) {
+            matrix[i][j] = Math.random() * 10;
         }
     }
 
-    return false;
+    return matrix;
 }
-
-function generateRawData(): RawData {
-    return JSON.parse(fs.readFileSync(rawDataPath, "utf8"));
-
-    //return {
-    //    coreid: coreid,
-    //    matrixOne: generateMatrix(matrixDimentions),
-    //    matrixTwo: generateMatrix(matrixDimentions)
-    //};
-}
-
-//function generateMatrix(dimentions: number): number[][] {
-//    const matrix: number[][] = [];
-//
-//    for (let i = 0; i < dimentions; i++) {
-//        matrix.push([]);
-//        for (let j = 0; j < dimentions; j++) {
-//            matrix[i][j] = Math.random() * 10;
-//        }
-//    }
-//
-//    return matrix;
-//}

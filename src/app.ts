@@ -6,7 +6,7 @@ import {
     registerJob,
     getResults
 } from "./task.model";
-import /*checkDelegatedWork, generateWork */ "./maintenance";
+import { checkWorkQueue, createWork } from "./maintenance";
 import express from "express";
 import bodyParser from "body-parser";
 
@@ -53,12 +53,10 @@ app.get<unknown, unknown, unknown>("/results", (_req, res) => {
     res.send(JSON.stringify(getResults()));
 });
 
-//checkDelegatedWork();
-//generateWork();
-
 setInterval(() => {
-    //checkDelegatedWork();
-    //generateWork();
+    if (checkWorkQueue() < 50) {
+        createWork();
+    }
 }, 30 * 60 * 1000);
 
 // Start server
