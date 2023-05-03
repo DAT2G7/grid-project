@@ -6,13 +6,14 @@ import {
     registerJob,
     getResults
 } from "./task.model";
+import config from "./config";
 import { checkWorkQueue, createWork } from "./maintenance";
 import express from "express";
 import bodyParser from "body-parser";
 
 // init app
 const app = express();
-const port = process.env.PORT || 3001;
+const port = config.PORT;
 app.use(express.json());
 // Give task data. Ids are query parameters as the grid server needs a standardised way to append them without potentially breaking the url
 // Ids are also not strictly needed, as the url is already directly tied to a specific core and job, but it's good practice to include them
@@ -54,7 +55,7 @@ app.get<unknown, unknown, unknown>("/results", (_req, res) => {
 });
 
 setInterval(() => {
-    if (checkWorkQueue() < 50) {
+    if (checkWorkQueue() < config.MINIMUM_TASKS) {
         createWork();
     }
 }, 30 * 60 * 1000);

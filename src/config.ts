@@ -13,6 +13,7 @@ export const DEFAULT_GRID_SERVER_ENDPOINT = "http://localhost:3000";
 export const DEFAULT_TASK_AMOUNT = "100";
 export const DEFAULT_MATRIX_HEIGHT = "10";
 export const DEFAULT_MATRIX_WIDTH = "10";
+export const DEFAULT_MINIMUM_TASKS = "100";
 
 export const MODE = process.env.MODE || DEFAULT_MODE;
 export const PORT = process.env.PORT || DEFAULT_PORT;
@@ -33,6 +34,10 @@ export const MATRIX_HEIGHT = parseInt(
 );
 export const MATRIX_WIDTH = parseInt(
     process.env.MATRIX_WIDTH || DEFAULT_MATRIX_WIDTH
+);
+
+export const MINIMUM_TASKS = parseInt(
+    process.env.MINIMUM_TASKS || DEFAULT_MINIMUM_TASKS
 );
 
 export const CORE_ID = process.env.CORE_ID;
@@ -83,5 +88,6 @@ export default {
     CORE_ID,
     TASK_AMOUNT,
     MATRIX_HEIGHT,
-    MATRIX_WIDTH
+    MATRIX_WIDTH,
+    MINIMUM_TASKS
 };
