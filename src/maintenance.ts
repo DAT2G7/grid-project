@@ -1,34 +1,9 @@
 import config from "./config";
-import { Job, RawData } from "./interfaces";
-import { createJob, registerJob } from "./task.model";
-import fs from "fs";
+import { RawData } from "./interfaces";
 
-export function checkWorkQueue(): number {
-    const jobs: Job[] = JSON.parse(
-        fs.readFileSync(config.JOBS_DB_PATH, "utf8")
-    );
-
-    let queuedTasks = 0;
-
-    jobs.forEach((job) => {
-        if (job.completedTasks < job.taskAmount) {
-            queuedTasks += job.taskAmount - job.completedTasks;
-        }
-    });
-
-    return queuedTasks;
-}
-
-export function createWork() {
-    const rawData = generateRawData();
-
-    const job = createJob(rawData);
-    registerJob(job);
-}
-
-function generateRawData(): RawData {
+export function generateRawData(coreId: string): RawData {
     let rawData: RawData = {
-        coreid: config.CORE_ID,
+        coreid: coreId,
         matrixes: []
     };
 

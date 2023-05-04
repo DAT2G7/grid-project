@@ -1,5 +1,5 @@
 export interface GetTaskQuery {
-    coreid: string;
+    projectid: string;
     jobid: string;
     taskid: string;
 }
@@ -10,6 +10,7 @@ export interface Job {
     taskAmount: number;
     coreid: string;
     creationTime: Date;
+    completionTime?: Date;
     completedTasks: number;
     result: number[][];
 }
@@ -21,7 +22,7 @@ export interface Task {
     delegationTime?: Date;
     completionTime?: Date;
     taskData: TaskData;
-    matrixColumnIndex: number;
+    taskIndex: number;
 }
 
 export interface RawData {
@@ -40,4 +41,27 @@ export interface TaskData {
 
 export interface Result {
     result: number[][];
+}
+
+export interface Setup {
+    coreId: string;
+    projectId: string;
+}
+
+export interface Database {
+    projectId: string;
+    coreId: string;
+    jobs: Job[];
+    completedJobsCount: number;
+    completedJobs: CompletedJob[];
+}
+
+export interface CompletedJob {
+    jobid: string;
+    coreid: string;
+    taskAmount: number;
+    result: number[][];
+    creationTime: Date;
+    completionTime: Date;
+    timeTaken: number;
 }

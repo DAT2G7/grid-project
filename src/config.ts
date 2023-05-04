@@ -5,15 +5,18 @@ dotenvConfig();
 
 export const DEFAULT_MODE = "debug";
 export const DEFAULT_PORT = 3001;
-export const DEFAULT_JOBS_DB_PATH = "./jobs.json";
+export const DEFAULT_DB_PATH = "./database.json";
+export const DEFAULT_CORE_PATH = "./bundle.js";
 export const DEFAULT_FINISHED_JOBS_DB_PATH = "./finishedJobs.json";
 export const DEFAULT_TASK_REQUEST_ENDPOINT = "http://localhost:3001/get-task";
 export const DEFAULT_TASK_RESULT_ENDPOINT = "http://localhost:3001/submit-task";
 export const DEFAULT_GRID_SERVER_ENDPOINT = "http://localhost:3000";
 export const DEFAULT_TASK_AMOUNT = "100";
-export const DEFAULT_MATRIX_HEIGHT = "10";
-export const DEFAULT_MATRIX_WIDTH = "10";
+export const DEFAULT_MATRIX_HEIGHT = "25";
+export const DEFAULT_MATRIX_WIDTH = "25";
 export const DEFAULT_MINIMUM_TASKS = "100";
+export const DEFAULT_MAINTENANCE_INTERVAL = "900000";
+export const DEFAULT_SETUP_PATH = "./setup.json";
 
 export const MODE = process.env.MODE || DEFAULT_MODE;
 export const PORT = process.env.PORT || DEFAULT_PORT;
@@ -40,14 +43,6 @@ export const MINIMUM_TASKS = parseInt(
     process.env.MINIMUM_TASKS || DEFAULT_MINIMUM_TASKS
 );
 
-export const CORE_ID = process.env.CORE_ID;
-if (!CORE_ID) {
-    console.error(
-        'CORE_ID environment variable not set in .env file.\n Please set it like this:\nCORE_ID = "<your core id>"\nExiting...'
-    );
-    process.exit(1);
-}
-
 if (
     MODE === "production" &&
     GRID_SERVER_ENDPOINT === DEFAULT_GRID_SERVER_ENDPOINT
@@ -58,22 +53,18 @@ if (
     process.exit(1);
 }
 
-export const PROJECTID = process.env.PROJECTID;
-if (!PROJECTID) {
-    console.error(
-        'PROJECTID environment variable not set in .env file.\n Please set it like this:\nPROJECTID = "<your project id>"\nExiting...'
-    );
-    process.exit(1);
-}
-
 export const JOBS_DB_PATH = path.resolve(
     process.cwd(),
-    process.env.JOBS_DB_PATH || DEFAULT_JOBS_DB_PATH
+    process.env.JOBS_DB_PATH || DEFAULT_DB_PATH
 );
 
 export const FINISHED_JOBS_DB_PATH = path.resolve(
     process.cwd(),
     process.env.FINISHED_JOBS_DB_PATH || DEFAULT_FINISHED_JOBS_DB_PATH
+);
+
+export const MAINTENANCE_INTERVAL = parseInt(
+    process.env.MAINTENANCE_INTERVAL || DEFAULT_MAINTENANCE_INTERVAL
 );
 
 export default {
@@ -84,10 +75,9 @@ export default {
     TASK_REQUEST_ENDPOINT,
     TASK_RESULT_ENDPOINT,
     GRID_SERVER_ENDPOINT,
-    PROJECTID,
-    CORE_ID,
     TASK_AMOUNT,
     MATRIX_HEIGHT,
     MATRIX_WIDTH,
-    MINIMUM_TASKS
+    MINIMUM_TASKS,
+    MAINTENANCE_INTERVAL
 };

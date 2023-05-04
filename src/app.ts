@@ -1,35 +1,30 @@
 import { GetTaskQuery, RawData } from "./interfaces";
-import {
-    getTaskData,
-    recieveResult,
-    createJob,
-    registerJob,
-    getResults
-} from "./task.model";
+import { createJob, registerJob } from "./task.model";
 import config from "./config";
-import { checkWorkQueue, createWork } from "./maintenance";
 import express from "express";
 import bodyParser from "body-parser";
+import { projectId, runSetup } from "./setup";
+import { DatabaseHandler } from "./db";
 
 // init app
 const app = express();
 const port = config.PORT;
-app.use(express.json());
+const database: DatabaseHandler = DatabaseHandler.getInstance();
+runSetup(database);
+
+app.use(express.json({ limit: "50mb" }));
+
 // Give task data. Ids are query parameters as the grid server needs a standardised way to append them without potentially breaking the url
 // Ids are also not strictly needed, as the url is already directly tied to a specific core and job, but it's good practice to include them
 app.get<unknown, unknown, unknown, GetTaskQuery>("/get-task", (req, res) => {
-    const { coreid, jobid, taskid } = req.query;
-    console.log("get-task", coreid, jobid, taskid);
     res.contentType("application/json");
     res.status(200);
-    res.send(JSON.stringify(getTaskData(req.query)));
+    res.send(JSON.stringify(database.getTaskData(req.query)));
 });
 
 // Recieve task results
 app.post<unknown, unknown, string, GetTaskQuery>("/submit-task", (req, res) => {
-    const { coreid, jobid, taskid } = req.query;
-    console.log("submit-task", coreid, jobid, taskid, req.body);
-    recieveResult(req.query, req.body as string);
+    database.saveResult(req.query, req.body as string);
     res.sendStatus(200);
 });
 
@@ -42,23 +37,18 @@ app.post<unknown, unknown, unknown, GetTaskQuery>(
 
         const rawData = req.body as RawData;
         const job = createJob(rawData);
-        await registerJob(job);
+        await registerJob(job, projectId);
+        database.saveJob(job);
         res.status(201);
         res.send();
     }
 );
 
-app.get<unknown, unknown, unknown>("/results", (_req, res) => {
-    res.contentType("application/json");
-    res.status(200);
-    res.send(JSON.stringify(getResults()));
-});
-
-setInterval(() => {
-    if (checkWorkQueue() < config.MINIMUM_TASKS) {
-        createWork();
-    }
-}, 30 * 60 * 1000);
+//app.get<unknown, unknown, unknown>("/results", (_req, res) => {
+//    res.contentType("application/json");
+//    res.status(200);
+//    res.send(JSON.stringify(getResults()));
+//});
 
 // Start server
 app.listen(port, () => {
