@@ -3,14 +3,14 @@ import { createJob, registerJob } from "./task.model";
 import config from "./config";
 import express from "express";
 import bodyParser from "body-parser";
-import { projectId, runSetup } from "./setup";
+import { runSetup } from "./setup";
 import { DatabaseHandler } from "./db";
 
 // init app
 const app = express();
 const port = config.PORT;
-const database: DatabaseHandler = DatabaseHandler.getInstance();
-runSetup(database);
+const database = DatabaseHandler.getInstance();
+runSetup();
 
 app.use(express.json({ limit: "50mb" }));
 
@@ -37,7 +37,7 @@ app.post<unknown, unknown, unknown, GetTaskQuery>(
 
         const rawData = req.body as RawData;
         const job = createJob(rawData);
-        await registerJob(job, projectId);
+        await registerJob(job, database.database.projectId);
         database.saveJob(job);
         res.status(201);
         res.send();

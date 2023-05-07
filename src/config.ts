@@ -5,9 +5,9 @@ dotenvConfig();
 
 export const DEFAULT_MODE = "debug";
 export const DEFAULT_PORT = 3001;
-export const DEFAULT_DB_PATH = "./database.json";
+export const DEFAULT_DB_PATH = "./data/database.json";
 export const DEFAULT_CORE_PATH = "./bundle.js";
-export const DEFAULT_FINISHED_JOBS_DB_PATH = "./finishedJobs.json";
+export const DEFAULT_FINISHED_JOBS_DB_PATH = "./data/finishedJobs.json";
 export const DEFAULT_TASK_REQUEST_ENDPOINT = "http://localhost:3001/get-task";
 export const DEFAULT_TASK_RESULT_ENDPOINT = "http://localhost:3001/submit-task";
 export const DEFAULT_GRID_SERVER_ENDPOINT = "http://localhost:3000";

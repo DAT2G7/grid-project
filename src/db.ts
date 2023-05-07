@@ -127,6 +127,8 @@ export class DatabaseHandler {
         job.completedTasks++;
 
         if (task.taskIndex === job.taskAmount - 1) {
+            console.log("Job " + job.jobid + " completed!");
+            console.log("Result: " + result);
             job.result = result as unknown as number[][];
             job.completionTime = new Date();
             this.saveJob(job);
@@ -274,8 +276,8 @@ export class DatabaseHandler {
         }
 
         const database: Database = {
-            projectId: "0000",
-            coreId: "0000",
+            projectId: "",
+            coreId: "",
             jobs: [],
             completedJobs: [],
             completedJobsCount: 0
