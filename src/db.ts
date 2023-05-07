@@ -216,7 +216,7 @@ export class DatabaseHandler {
     }
 
     public makeJobs() {
-        console.log("Making jobs");
+        console.log("Making job");
         const rawData: RawData = generateRawData(this.database.coreId);
 
         const job: Job = createJob(rawData);

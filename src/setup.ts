@@ -23,7 +23,7 @@ export async function runSetup() {
     }
 
     if (!database.haveUnfinishedJobs()) {
-        console.log("not enough jobs, creating more");
+        console.log("not enough work, creating more");
         database.makeJobs();
     }
 }
@@ -64,11 +64,11 @@ async function getCoreID(): Promise<string> {
     //console.log("Response:");
     //console.log(response);
     const json = await response.json();
-    console.log("JSON:");
-    console.log(json);
+    //console.log("JSON:");
+    //console.log(json);
     coreId = json.coreid;
-    console.log("Core ID:");
-    console.log(coreId);
+    //console.log("Core ID:");
+    //console.log(coreId);
 
     return coreId;
 }
