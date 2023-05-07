@@ -10,7 +10,6 @@ export async function runSetup() {
         await getProjectID().then((res) => {
             console.log("got project id", res);
             database.setProjectId(res);
-            console.log("set project id", database.database.projectId);
         });
     }
     if (!checkCoreID(database.database.coreId)) {
@@ -18,7 +17,6 @@ export async function runSetup() {
         await getCoreID().then((res) => {
             console.log("got core id", res);
             database.setCoreId(res);
-            console.log("set core id", database.database.coreId);
         });
     }
 
