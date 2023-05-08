@@ -342,6 +342,6 @@ export class DatabaseHandler {
     }
 
     private getPeriod(date1: Date, date2: Date) {
-        return Math.abs(date1.getTime() - date2.getTime());
+        return Math.abs(new Date(date1).getTime() - new Date(date2).getTime());
     }
 }
