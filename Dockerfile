@@ -9,6 +9,9 @@ COPY src/ ./src
 COPY bundle.js ./bundle.js
 
 ENV JOBS_DB_PATH="/data/jobs.json"
+ENV GRID_SERVER_ENDPOINT="http://localhost:3000"
+ENV TASK_REQUEST_ENDPOINT="http://localhost:3000"
+ENV TASK_RESULT_ENDPOINT="http://localhost:3000"
 
 RUN npm install
 
