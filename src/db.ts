@@ -227,20 +227,20 @@ export class DatabaseHandler {
     }
 
     private getDatabaseFromDisk(): Database {
-        if (!fs.existsSync(process.env.DATABASE_PATH || DEFAULT_DB_PATH)) {
+        if (!fs.existsSync(process.env.JOBS_DB_PATH || DEFAULT_DB_PATH)) {
             this.createDatabaseOnDisk();
         }
 
         return JSON.parse(
             fs
-                .readFileSync(process.env.DATABASE_PATH || DEFAULT_DB_PATH)
+                .readFileSync(process.env.JOBS_DB_PATH || DEFAULT_DB_PATH)
                 .toString()
         );
     }
 
     public saveDatabaseToDisk() {
         fs.writeFileSync(
-            process.env.DATABASE_PATH || DEFAULT_DB_PATH,
+            process.env.JOBS_DB_PATH || DEFAULT_DB_PATH,
             JSON.stringify(this.database)
         );
     }
@@ -271,8 +271,8 @@ export class DatabaseHandler {
     }
 
     public createDatabaseOnDisk() {
-        if (fs.existsSync(process.env.DATABASE_PATH || DEFAULT_DB_PATH)) {
-            fs.rmSync(process.env.DATABASE_PATH || DEFAULT_DB_PATH);
+        if (fs.existsSync(process.env.JOBS_DB_PATH || DEFAULT_DB_PATH)) {
+            fs.rmSync(process.env.JOBS_DB_PATH || DEFAULT_DB_PATH);
         }
 
         const database: Database = {
@@ -284,7 +284,7 @@ export class DatabaseHandler {
         };
 
         fs.writeFileSync(
-            process.env.DATABASE_PATH || DEFAULT_DB_PATH,
+            process.env.JOBS_DB_PATH || DEFAULT_DB_PATH,
             JSON.stringify(database)
         );
     }

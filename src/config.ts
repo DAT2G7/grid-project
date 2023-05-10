@@ -54,12 +54,10 @@ if (
 }
 
 export const JOBS_DB_PATH = path.resolve(
-    process.cwd(),
     process.env.JOBS_DB_PATH || DEFAULT_DB_PATH
 );
 
 export const FINISHED_JOBS_DB_PATH = path.resolve(
-    process.cwd(),
     process.env.FINISHED_JOBS_DB_PATH || DEFAULT_FINISHED_JOBS_DB_PATH
 );
 
