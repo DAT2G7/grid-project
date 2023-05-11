@@ -6,11 +6,12 @@ import {
     GetTaskQuery,
     Task,
     TaskData,
-    RawData,
-    CompletedJob
+    RawData
+    /*CompletedJob*/
 } from "./interfaces";
 import { generateRawData } from "./maintenance";
 import { createJob, registerJob } from "./task.model";
+import config from "./config";
 
 export class DatabaseHandler {
     database: Database;
@@ -34,16 +35,16 @@ export class DatabaseHandler {
             process.exit(2);
         });
 
-        // Maintain database every 30 seconds
+        // Maintain database every 6 seconds
         setInterval(() => {
             this.maintainDatabase();
         }, 6000);
     }
 
     private maintainDatabase() {
-        this.pruneDatabase();
+        //this.pruneDatabase();
         //this.printStats();
-        if (!this.haveUnfinishedJobs()) {
+        if (this.countUnfinishedTasks() < config.MINIMUM_TASKS) {
             this.makeJobs();
         } else {
             //const job = this.database.jobs[this.database.jobs.length - 1];
@@ -148,45 +149,47 @@ export class DatabaseHandler {
         return job;
     }
 
-    public saveJob(job: Job) {
+    public saveJob(newJob: Job) {
         // check if job exists on db already.
         // if it does, replace it with the updated one.
 
         const jobIndex: number = this.database.jobs.findIndex(
-            (job: Job) => job.jobid === job.jobid
+            (job: Job) => job.jobid === newJob.jobid
         );
 
         if (jobIndex !== -1) {
-            this.database.jobs[jobIndex] = job;
+            this.database.jobs[jobIndex] = newJob;
         } else {
-            this.database.jobs.push(job);
+            this.database.jobs.push(newJob);
         }
 
-        return job;
+        return newJob;
     }
 
     public getTaskData(getTaskQuery: GetTaskQuery): TaskData | null {
         const job = this.getJob(getTaskQuery.jobid);
 
+        // If job does not exist, return null
         if (!job) {
             return null;
         }
 
+        // If job is completed, return task data for first task. The computation doesn't matter.
         if (job.completedTasks === job.taskAmount) {
             return job.tasks[0].taskData;
         }
 
-        // Check if task with taskid exists
-
+        // Check if task with requested taskid exists
         let task = job.tasks.find(
             (task: Task) => task.taskid === getTaskQuery.taskid
         );
 
+        // If task with taskid exists, return task data for that task.
         if (task) {
             return task.taskData;
         }
 
-        // If task with taskid does not exist, find first task with id = "0000" and defined matrixes
+        // If task with taskid does not exist, find first task with id = "0000" and defined matrices
         task = job.tasks.find(
             (task: Task) =>
                 task.taskid === "0000" &&
@@ -194,6 +197,7 @@ export class DatabaseHandler {
                 task.taskData.matrixB
         );
 
+        // If task with id = "0000" and defined matrices exists, assign taskid to it and return task data
         if (task) {
             task.taskid = getTaskQuery.taskid;
             task.delegationTime = new Date();
@@ -219,9 +223,9 @@ export class DatabaseHandler {
         console.log("Making job");
         const rawData: RawData = generateRawData(this.database.coreId);
 
-        const job: Job = createJob(rawData);
+        const Rawjob: Job = createJob(rawData);
 
-        registerJob(job, this.database.projectId).then((job: Job) => {
+        registerJob(Rawjob, this.database.projectId).then((job: Job) => {
             this.saveJob(job);
         });
     }
@@ -299,49 +303,50 @@ export class DatabaseHandler {
         this.saveDatabaseToDisk();
     }
 
-    public haveUnfinishedJobs(): boolean {
+    public countUnfinishedTasks(): number {
+        let unfinishedTasks = 0;
         for (const job of this.database.jobs) {
-            if (job.completedTasks !== job.taskAmount) {
-                return true;
+            if (job.completedTasks < job.taskAmount) {
+                unfinishedTasks += job.taskAmount - job.completedTasks;
             }
         }
 
-        return false;
+        return unfinishedTasks;
     }
 
-    private pruneDatabase() {
-        const newJobs: Job[] = [];
+    //private pruneDatabase() {
+    //    const newJobs: Job[] = [];
+    //
+    //    for (const job of this.database.jobs) {
+    //        if (job.completedTasks !== job.taskAmount) {
+    //            newJobs.push(job);
+    //            continue;
+    //        }
+    //        this.database.completedJobsCount++;
+    //
+    //        const completedJob: CompletedJob = {
+    //            jobid: job.jobid,
+    //            coreid: job.coreid,
+    //            result: job.result,
+    //            completionTime: job.completionTime!,
+    //            creationTime: job.creationTime,
+    //            taskAmount: job.taskAmount,
+    //            timeTaken: this.getPeriod(
+    //                job.completionTime!,
+    //                job.creationTime!
+    //            )
+    //        };
+    //        this.database.completedJobs.push(completedJob);
+    //    }
+    //
+    //    this.database.jobs = newJobs;
+    //
+    //    this.saveDatabaseToDisk();
+    //
+    //    return;
+    //}
 
-        for (const job of this.database.jobs) {
-            if (job.completedTasks !== job.taskAmount) {
-                newJobs.push(job);
-                continue;
-            }
-            this.database.completedJobsCount++;
-
-            const completedJob: CompletedJob = {
-                jobid: job.jobid,
-                coreid: job.coreid,
-                result: job.result,
-                completionTime: job.completionTime!,
-                creationTime: job.creationTime,
-                taskAmount: job.taskAmount,
-                timeTaken: this.getPeriod(
-                    job.completionTime!,
-                    job.creationTime!
-                )
-            };
-            this.database.completedJobs.push(completedJob);
-        }
-
-        this.database.jobs = newJobs;
-
-        this.saveDatabaseToDisk();
-
-        return;
-    }
-
-    private getPeriod(date1: Date, date2: Date) {
-        return Math.abs(new Date(date1).getTime() - new Date(date2).getTime());
-    }
+    //private getPeriod(date1: Date, date2: Date) {
+    //    return Math.abs(new Date(date1).getTime() - new Date(date2).getTime());
+    //}
 }

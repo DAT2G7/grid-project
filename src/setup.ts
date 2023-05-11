@@ -1,6 +1,7 @@
 import { DEFAULT_GRID_SERVER_ENDPOINT, DEFAULT_CORE_PATH } from "./config";
 import fs from "fs";
 import { DatabaseHandler } from "./db";
+import config from "./config";
 
 export async function runSetup() {
     const database = DatabaseHandler.getInstance();
@@ -20,7 +21,7 @@ export async function runSetup() {
         });
     }
 
-    if (!database.haveUnfinishedJobs()) {
+    if (database.countUnfinishedTasks() < config.MINIMUM_TASKS) {
         console.log("not enough work, creating more");
         database.makeJobs();
     }

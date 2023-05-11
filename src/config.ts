@@ -11,10 +11,10 @@ export const DEFAULT_FINISHED_JOBS_DB_PATH = "./data/finishedJobs.json";
 export const DEFAULT_TASK_REQUEST_ENDPOINT = "http://localhost:3001/get-task";
 export const DEFAULT_TASK_RESULT_ENDPOINT = "http://localhost:3001/submit-task";
 export const DEFAULT_GRID_SERVER_ENDPOINT = "http://localhost:3000";
-export const DEFAULT_TASK_AMOUNT = "5";
-export const DEFAULT_MATRIX_HEIGHT = "5";
-export const DEFAULT_MATRIX_WIDTH = "5";
-export const DEFAULT_MINIMUM_TASKS = "5";
+export const DEFAULT_TASK_AMOUNT = "100";
+export const DEFAULT_MATRIX_HEIGHT = "50";
+export const DEFAULT_MATRIX_WIDTH = "50";
+export const DEFAULT_MINIMUM_TASKS = "90";
 export const DEFAULT_MAINTENANCE_INTERVAL = "900000";
 export const DEFAULT_SETUP_PATH = "./setup.json";
 
