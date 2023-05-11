@@ -56,13 +56,17 @@ export async function registerJob(job: Job, projectid: string): Promise<Job> {
     };
     const json: string = JSON.stringify(jobQuery);
 
-    await fetch(config.GRID_SERVER_ENDPOINT + "/api/project/job", {
-        method: "POST",
-        body: json,
-        headers: { "Content-Type": "application/json" }
-    })
-        .then((res) => res.json())
-        .then((res) => (job.jobid = res.jobid));
+    try {
+        await fetch(config.GRID_SERVER_ENDPOINT + "/api/project/job", {
+            method: "POST",
+            body: json,
+            headers: { "Content-Type": "application/json" }
+        })
+            .then((res) => res.json())
+            .then((res) => (job.jobid = res.jobid));
+    } catch (err) {
+        console.log(err);
+    }
 
     assignTaskJobIds(job);
     return job;
