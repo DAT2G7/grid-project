@@ -7,7 +7,6 @@ import {
     Task,
     TaskData,
     RawData
-    /*CompletedJob*/
 } from "./interfaces";
 import { generateRawData } from "./maintenance";
 import { createJob, registerJob } from "./task.model";
@@ -42,64 +41,11 @@ export class DatabaseHandler {
     }
 
     private maintainDatabase() {
-        //this.pruneDatabase();
-        //this.printStats();
         if (this.countUnfinishedTasks() < config.MINIMUM_TASKS) {
             this.makeJobs();
-        } else {
-            //const job = this.database.jobs[this.database.jobs.length - 1];
-            //// get last three tasks in job
-            //const tasks = job.tasks.slice(job.tasks.length - 3);
-            //
-            //const index = job.tasks.findIndex(
-            //    (task) =>
-            //        task.taskData.matrixA === undefined &&
-            //        task.taskData.matrixB === undefined
-            //);
-            //console.log("index of last empty task: " + index);
-            //console.log("Last 3 tasks in job:");
-            //console.log(tasks);
         }
     }
 
-    //private printStats() {
-    //    const totalJobTime = this.getTotalJobTime();
-    //    const totalTasks = this.getTotalTasks();
-    //    const averageJobTime = totalJobTime / this.database.completedJobsCount;
-    //    const averageTaskTime = totalJobTime / totalTasks;
-    //
-    //    console.log("Database stats:");
-    //    console.log(
-    //        "Jobs: " +
-    //            this.database.jobs.length +
-    //            this.database.completedJobs.length
-    //    );
-    //    console.log("Completed jobs: " + this.database.completedJobsCount);
-    //    console.log("Total job time: " + totalJobTime / 60 + "s");
-    //    console.log("Average job time: " + averageJobTime / 60 + "s");
-    //    console.log("Total tasks: " + totalTasks);
-    //    console.log("Average task time: " + averageTaskTime / 60 + "s");
-    //}
-
-    //private getTotalJobTime() {
-    //    let totalJobTime = 0;
-    //    for (let i = 0; i < this.database.completedJobs.length; i++) {
-    //        const job = this.database.completedJobs[i];
-    //        totalJobTime +=
-    //            job.completionTime.getTime() - job.creationTime.getTime();
-    //    }
-    //    return totalJobTime;
-    //}
-    //
-    //private getTotalTasks() {
-    //    let totalTasks = 0;
-    //    for (let i = 0; i < this.database.completedJobs.length; i++) {
-    //        totalTasks += this.database.completedJobs[i].taskAmount;
-    //    }
-    //    return totalTasks;
-    //}
-
-    // Singleton
     private static instance: DatabaseHandler;
 
     public static getInstance(): DatabaseHandler {
@@ -152,7 +98,6 @@ export class DatabaseHandler {
     public saveJob(newJob: Job) {
         // check if job exists on db already.
         // if it does, replace it with the updated one.
-
         const jobIndex: number = this.database.jobs.findIndex(
             (job: Job) => job.jobid === newJob.jobid
         );
@@ -313,40 +258,4 @@ export class DatabaseHandler {
 
         return unfinishedTasks;
     }
-
-    //private pruneDatabase() {
-    //    const newJobs: Job[] = [];
-    //
-    //    for (const job of this.database.jobs) {
-    //        if (job.completedTasks !== job.taskAmount) {
-    //            newJobs.push(job);
-    //            continue;
-    //        }
-    //        this.database.completedJobsCount++;
-    //
-    //        const completedJob: CompletedJob = {
-    //            jobid: job.jobid,
-    //            coreid: job.coreid,
-    //            result: job.result,
-    //            completionTime: job.completionTime!,
-    //            creationTime: job.creationTime,
-    //            taskAmount: job.taskAmount,
-    //            timeTaken: this.getPeriod(
-    //                job.completionTime!,
-    //                job.creationTime!
-    //            )
-    //        };
-    //        this.database.completedJobs.push(completedJob);
-    //    }
-    //
-    //    this.database.jobs = newJobs;
-    //
-    //    this.saveDatabaseToDisk();
-    //
-    //    return;
-    //}
-
-    //private getPeriod(date1: Date, date2: Date) {
-    //    return Math.abs(new Date(date1).getTime() - new Date(date2).getTime());
-    //}
 }
