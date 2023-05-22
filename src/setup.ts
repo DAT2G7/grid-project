@@ -22,7 +22,7 @@ function calculateStats() {
 
                 const startDate = Date.parse(task.delegationTime.toString());
                 const endDate = Date.parse(task.completionTime.toString());
-                taskCompletionTimes.push(startDate - endDate);
+                taskCompletionTimes.push(endDate - startDate);
             }
         }
     }
