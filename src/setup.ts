@@ -14,6 +14,7 @@ function calculateStats() {
     let taskCompletionTimes = [];
 
     for (let i = 0; i < jobs.length; i++) {
+        console.log("Job " + i);
         const job = jobs[i];
         for (let j = 0; j < job.tasks.length; j++) {
             const task = job.tasks[j];
@@ -29,7 +30,7 @@ function calculateStats() {
     const totalTaskCompletionTime = taskCompletionTimes.reduce((a, b) => a + b, 0);
     const averageTaskCompletionTime = totalTaskCompletionTime / taskCompletionTimes.length;
 
-    //console.log("Average task completion time: " + averageTaskCompletionTime);
+    console.log("Average task completion time: " + averageTaskCompletionTime);
 
 
 }
