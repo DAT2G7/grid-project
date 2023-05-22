@@ -30,7 +30,7 @@ function calculateStats() {
     const totalTaskCompletionTime = taskCompletionTimes.reduce((a, b) => a + b, 0);
     const averageTaskCompletionTime = totalTaskCompletionTime / taskCompletionTimes.length;
 
-    console.log("Average task completion time: " + averageTaskCompletionTime);
+    console.log("Average task completion time: " + averageTaskCompletionTime / 1000 + " seconds");
 
 
 }
