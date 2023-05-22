@@ -74,8 +74,6 @@ export class DatabaseHandler {
         job.completedTasks++;
 
         if (task.taskIndex === job.taskAmount - 1) {
-            console.log("Job " + job.jobid + " completed!");
-            console.log("Result: " + result);
             job.result = result as unknown as number[][];
             job.completionTime = new Date();
             this.saveJob(job);
@@ -165,7 +163,6 @@ export class DatabaseHandler {
     }
 
     public makeJobs() {
-        console.log("Making job");
         const rawData: RawData = generateRawData(this.database.coreId);
 
         const Rawjob: Job = createJob(rawData);

@@ -65,7 +65,7 @@ export async function registerJob(job: Job, projectid: string): Promise<Job> {
             .then((res) => res.json())
             .then((res) => (job.jobid = res.jobid));
     } catch (err) {
-        console.log(err);
+        //console.log(err);
     }
 
     assignTaskJobIds(job);

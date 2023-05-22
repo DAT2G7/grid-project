@@ -4,96 +4,32 @@ import { DatabaseHandler } from "./db";
 import config from "./config";
 
 export async function runSetup() {
+    calculateStats();
+}
+
+function calculateStats() {
     const database = DatabaseHandler.getInstance();
 
-    if (!checkProjectID(database.database.projectId)) {
-        console.log("no project id, getting one");
-        await getProjectID().then((res) => {
-            console.log("got project id", res);
-            database.setProjectId(res);
-        });
-    }
-    if (!checkCoreID(database.database.coreId)) {
-        console.log("no core id, getting one");
-        await getCoreID().then((res) => {
-            console.log("got core id", res);
-            database.setCoreId(res);
-        });
-    }
+    const jobs = database.database.jobs;
+    let taskCompletionTimes = [];
 
-    if (database.countUnfinishedTasks() < config.MINIMUM_TASKS) {
-        console.log("not enough work, creating more");
-        database.makeJobs();
-    }
-}
+    for (let i = 0; i < jobs.length; i++) {
+        const job = jobs[i];
+        for (let j = 0; j < job.tasks.length; j++) {
+            const task = job.tasks[j];
+            if (task.delegationTime && task.completionTime) {
 
-async function getProjectID(): Promise<string> {
-    let projectId: string = "";
-    await fetch(
-        (process.env.GRID_SERVER_ENDPOINT || DEFAULT_GRID_SERVER_ENDPOINT) +
-            "/api/project/signup",
-        {
-            method: "POST"
+                const startDate = Date.parse(task.delegationTime.toString());
+                const endDate = Date.parse(task.completionTime.toString());
+                taskCompletionTimes.push(startDate - endDate);
+            }
         }
-    )
-        .then((res) => res.json())
-        .then((res) => (projectId = res.projectid));
-    return projectId;
-}
-
-async function getCoreID(): Promise<string> {
-    let coreId: string = "";
-    const buffer: Buffer = fs.readFileSync(
-        process.env.GRID_CORE_PATH || DEFAULT_CORE_PATH
-    );
-
-    const blob: Blob = new Blob([buffer], { type: "application/octet-stream" });
-    const formData = new FormData();
-    formData.append("core", blob, "core");
-
-    const response = await fetch(
-        (process.env.GRID_SERVER_ENDPOINT || DEFAULT_GRID_SERVER_ENDPOINT) +
-            "/api/project/core",
-        {
-            method: "POST",
-            body: formData
-        }
-    );
-
-    //console.log("Response:");
-    //console.log(response);
-    const json = await response.json();
-    //console.log("JSON:");
-    //console.log(json);
-    coreId = json.coreid;
-    //console.log("Core ID:");
-    //console.log(coreId);
-
-    return coreId;
-}
-
-function checkProjectID(projectId: string): boolean {
-    if (
-        projectId &&
-        projectId !== "" &&
-        projectId !== "null" &&
-        projectId !== "undefined" &&
-        projectId !== "0000"
-    ) {
-        return true;
     }
-    return false;
-}
+    
+    const totalTaskCompletionTime = taskCompletionTimes.reduce((a, b) => a + b, 0);
+    const averageTaskCompletionTime = totalTaskCompletionTime / taskCompletionTimes.length;
 
-function checkCoreID(coreId: string): boolean {
-    if (
-        coreId &&
-        coreId !== "" &&
-        coreId !== "null" &&
-        coreId !== "undefined" &&
-        coreId !== "0000"
-    ) {
-        return true;
-    }
-    return false;
+    //console.log("Average task completion time: " + averageTaskCompletionTime);
+
+
 }
