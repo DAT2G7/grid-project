@@ -32,14 +32,41 @@ function calculateStats() {
     );
     const averageTaskCompletionTime =
         totalTaskCompletionTime / taskCompletionTimes.length;
+    taskCompletionTimes.sort((a, b) => a - b);
 
+    console.log("Total number of jobs: " + jobs.length);
     console.log(
         "Total task completion time: " +
             totalTaskCompletionTime / 1000 +
             " seconds"
     );
+    console.log("10 Longest task completion times: ");
+    for (let i = 0; i < 10; i++) {
+        console.log(taskCompletionTimes[taskCompletionTimes.length - 1 - i]);
+    }
 
-    taskCompletionTimes.sort((a, b) => a - b);
+    console.log("10 Shortest task completion times: ");
+    for (let i = 0; i < 10; i++) {
+        console.log(taskCompletionTimes[i]);
+    }
+
+    console.log("Quartiles: ");
+
+    console.log(
+        "First quartile: " +
+            taskCompletionTimes[Math.floor(taskCompletionTimes.length / 4)]
+    );
+    console.log(
+        "Second quartile: " +
+            taskCompletionTimes[Math.floor(taskCompletionTimes.length / 2)]
+    );
+    console.log(
+        "Third quartile: " +
+            taskCompletionTimes[
+                Math.floor((3 * taskCompletionTimes.length) / 4)
+            ]
+    );
+
     if (totalTaskCompletionTime % 2 == 0) {
         const medianTaskCompletionTime =
             (taskCompletionTimes[taskCompletionTimes.length / 2] +
