@@ -9,6 +9,6 @@ const port = config.PORT;
 const database = DatabaseHandler.getInstance();
 console.log("Running startup tasks...");
 //runSetup();
-app.use("/static", express.static("src/public"));
+app.use("/static", express.static(__dirname + "/public"));
 app.listen(3000);
 console.log("Server listening on port " + 3000);
