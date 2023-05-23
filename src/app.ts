@@ -8,5 +8,5 @@ const app = express();
 const port = config.PORT;
 const database = DatabaseHandler.getInstance();
 console.log("Running startup tasks...");
-runSetup();
-process.exit(0);
+//runSetup();
+app.use("/static", express.static("public"));

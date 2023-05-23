@@ -2,15 +2,35 @@ import { DEFAULT_GRID_SERVER_ENDPOINT, DEFAULT_CORE_PATH } from "./config";
 import fs from "fs";
 import { DatabaseHandler } from "./db";
 import config from "./config";
+import { Database, Job } from "./interfaces";
 
 export async function runSetup() {
-    calculateStats();
+    calculateStats(readMultipleDatabaseJobs());
 }
 
-function calculateStats() {
-    const database = DatabaseHandler.getInstance();
+function readMultipleDatabaseJobs(): Job[] {
+    const jobsOne: Database = JSON.parse(
+        fs.readFileSync("./data/jobs1.json", "utf8")
+    );
+    const jobsTwo: Database = JSON.parse(
+        fs.readFileSync("./data/jobs2.json", "utf8")
+    );
+    const jobsThree: Database = JSON.parse(
+        fs.readFileSync("./data/jobs3.json", "utf8")
+    );
+    const jobsFour: Database = JSON.parse(
+        fs.readFileSync("./data/jobs4.json", "utf8")
+    );
 
-    const jobs = database.database.jobs;
+    const jobs = jobsOne.jobs
+        .concat(jobsTwo.jobs)
+        .concat(jobsThree.jobs)
+        .concat(jobsFour.jobs);
+
+    return jobs;
+}
+
+function calculateStats(jobs: Job[]) {
     let taskCompletionTimes = [];
 
     for (let i = 0; i < jobs.length; i++) {
