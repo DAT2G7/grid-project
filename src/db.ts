@@ -1,16 +1,18 @@
-import fs from "fs";
-import { DEFAULT_DB_PATH } from "./config";
 import {
     Database,
-    Job,
     GetTaskQuery,
+    Job,
+    RawData,
     Task,
-    TaskData,
-    RawData
+    TaskData
 } from "./interfaces";
-import { generateRawData } from "./maintenance";
 import { createJob, registerJob } from "./task.model";
+
+import { DEFAULT_DB_PATH } from "./config";
 import config from "./config";
+import fs from "fs";
+import { generateRawData } from "./maintenance";
+import path from "path";
 
 export class DatabaseHandler {
     database: Database;
@@ -220,8 +222,9 @@ export class DatabaseHandler {
     }
 
     public createDatabaseOnDisk() {
-        if (fs.existsSync(process.env.JOBS_DB_PATH || DEFAULT_DB_PATH)) {
-            fs.rmSync(process.env.JOBS_DB_PATH || DEFAULT_DB_PATH);
+        const dbPath = process.env.JOBS_DB_PATH || DEFAULT_DB_PATH;
+        if (fs.existsSync(dbPath)) {
+            fs.rmSync(dbPath);
         }
 
         const database: Database = {
@@ -232,10 +235,11 @@ export class DatabaseHandler {
             completedJobsCount: 0
         };
 
-        fs.writeFileSync(
-            process.env.JOBS_DB_PATH || DEFAULT_DB_PATH,
-            JSON.stringify(database)
-        );
+        const dirPath = path.dirname(dbPath);
+
+        fs.mkdirSync(dirPath, { recursive: true });
+
+        fs.writeFileSync(dbPath, JSON.stringify(database));
     }
 
     public setProjectId(projectId: string) {
