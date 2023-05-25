@@ -3,20 +3,29 @@ import path from "path";
 
 dotenvConfig();
 
+// Default Mode
 export const DEFAULT_MODE = "debug";
-export const DEFAULT_PORT = 3001;
+
+// Default File paths
 export const DEFAULT_DB_PATH = "./data/database.json";
 export const DEFAULT_CORE_PATH = "./bundle.js";
 export const DEFAULT_FINISHED_JOBS_DB_PATH = "./data/finishedJobs.json";
+export const DEFAULT_SETUP_PATH = "./setup.json";
+
+// Default Network endpoints
+export const DEFAULT_PORT = 3001;
 export const DEFAULT_TASK_REQUEST_ENDPOINT = "http://localhost:3001/get-task";
 export const DEFAULT_TASK_RESULT_ENDPOINT = "http://localhost:3001/submit-task";
+
+// Default Grid server endpoint
 export const DEFAULT_GRID_SERVER_ENDPOINT = "http://localhost:3000";
+
+// Default Task generation values
 export const DEFAULT_TASK_AMOUNT = "100";
 export const DEFAULT_MATRIX_HEIGHT = "50";
 export const DEFAULT_MATRIX_WIDTH = "50";
 export const DEFAULT_MINIMUM_TASKS = "90";
 export const DEFAULT_MAINTENANCE_INTERVAL = "900000";
-export const DEFAULT_SETUP_PATH = "./setup.json";
 
 export const MODE = process.env.MODE || DEFAULT_MODE;
 export const PORT = process.env.PORT || DEFAULT_PORT;
@@ -43,6 +52,7 @@ export const MINIMUM_TASKS = parseInt(
     process.env.MINIMUM_TASKS || DEFAULT_MINIMUM_TASKS
 );
 
+// In a production environment, the grid server endpoint must be set, as default localhost will not be accessible to the grid server.
 if (
     MODE === "production" &&
     GRID_SERVER_ENDPOINT === DEFAULT_GRID_SERVER_ENDPOINT

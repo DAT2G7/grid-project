@@ -6,7 +6,7 @@ import {
     Task,
     TaskData
 } from "./interfaces";
-import { createJob, registerJob } from "./task.model";
+import { createJob, registerJob, assignNewDataToTask } from "./task.model";
 
 import { DEFAULT_DB_PATH } from "./config";
 import config from "./config";
@@ -18,8 +18,6 @@ import path from "path";
  * DatabaseHandler is a singleton class that handles all database operations.
  * It loads the database from disk on startup and saves it to disk every 6 seconds.
  * It also maintains the database by creating new jobs if the amount of unfinished tasks is below a certain threshold.
- *
- * @class DatabaseHandler
  * */
 export class DatabaseHandler {
     database: Database;
@@ -104,7 +102,7 @@ export class DatabaseHandler {
             job.completionTime = new Date();
             this.saveJob(job);
         } else {
-            this.assignNewDataToTask(job, result as unknown as number[][]);
+            assignNewDataToTask(job, result as unknown as number[][]);
             this.saveJob(job);
         }
     }
@@ -200,18 +198,6 @@ export class DatabaseHandler {
     }
 
     /**
-     * Clears the database of all jobs.
-     *
-     * @function clearJobs
-     * @returns {void}
-     */
-    public clearJobs() {
-        this.database.jobs = [];
-
-        this.saveDatabaseToDisk();
-    }
-
-    /**
      * Retrieves the amount of jobs in the database.
      * @returns {number} The amount of jobs in the database.
      */
@@ -287,24 +273,6 @@ export class DatabaseHandler {
         return job.tasks.find(
             (task: Task) => task.taskid === getTaskQuery.taskid
         );
-    }
-
-    /**
-     * Assigns new data to the first task in a job that has undefined matrices.
-     * @param job The job to assign the data to.
-     * @param result The matrix to assign.
-     */
-    private assignNewDataToTask(job: Job, result: number[][]) {
-        for (let i = 0; i < job.taskAmount; i++) {
-            if (job.tasks[i].taskData.matrixA === undefined) {
-                job.tasks[i].taskData.matrixA = result;
-                break;
-            }
-            if (job.tasks[i].taskData.matrixB === undefined) {
-                job.tasks[i].taskData.matrixB = result;
-                break;
-            }
-        }
     }
 
     /**
