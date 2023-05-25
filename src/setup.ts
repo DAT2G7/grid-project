@@ -3,6 +3,12 @@ import fs from "fs";
 import { DatabaseHandler } from "./db";
 import config from "./config";
 
+/**
+ * Runs the setup process. This includes getting a project id and a core id, and creating jobs, if necessary.
+ *
+ * @async
+ * @function runSetup
+ */
 export async function runSetup() {
     const database = DatabaseHandler.getInstance();
 
@@ -27,6 +33,13 @@ export async function runSetup() {
     }
 }
 
+/**
+ * Registers a project with the grid server, and recieves a project id in response.
+ *
+ * @async
+ * @function getProjectID
+ * @returns {Promise<string>} The project id.
+ */
 async function getProjectID(): Promise<string> {
     let projectId: string = "";
     await fetch(
@@ -41,6 +54,13 @@ async function getProjectID(): Promise<string> {
     return projectId;
 }
 
+/**
+ * Registers a core with the grid server, and recieves a core id in response.
+ *
+ * @async
+ * @function getCoreID
+ * @returns {Promise<string>} The core id.
+ */
 async function getCoreID(): Promise<string> {
     let coreId: string = "";
     const buffer: Buffer = fs.readFileSync(
@@ -60,18 +80,17 @@ async function getCoreID(): Promise<string> {
         }
     );
 
-    //console.log("Response:");
-    //console.log(response);
     const json = await response.json();
-    //console.log("JSON:");
-    //console.log(json);
     coreId = json.coreid;
-    //console.log("Core ID:");
-    //console.log(coreId);
 
     return coreId;
 }
 
+/**
+ * Checks if the project id is valid.
+ * @param {string} projectId The project id to check.
+ * @returns {boolean} True if the project id is valid, false otherwise.
+ */
 function checkProjectID(projectId: string): boolean {
     if (
         projectId &&
@@ -85,6 +104,11 @@ function checkProjectID(projectId: string): boolean {
     return false;
 }
 
+/**
+ * Checks if the core id is valid.
+ * @param {string} coreId The core id to check.
+ * @returns {boolean} True if the core id is valid, false otherwise.
+ */
 function checkCoreID(coreId: string): boolean {
     if (
         coreId &&
